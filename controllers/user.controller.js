@@ -275,4 +275,3 @@ const createPass = async()=>{
    const hashedPassword = await bcrypt.hash("@khewat@1234#", 10);
    console.log(hashedPassword);
 }
-createPass();

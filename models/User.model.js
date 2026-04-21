@@ -53,7 +53,19 @@ const userSchema = new mongoose.Schema({
   downloaded: {
     type: Boolean,
     default: false
-  }
+  },
+  
+  // Track user internship interests
+  internshipInterests: [
+    {
+      category: String,
+      subCategory: String,
+      appliedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ]
 }, { timestamps: true });
 
 // ✅ CREATE MODEL

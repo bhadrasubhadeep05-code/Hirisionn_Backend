@@ -274,11 +274,23 @@ const getUserStats = asyncHandler(async (req, res) => {
     }, "Stats fetched successfully"));
 });
 
+// @desc    Get all internship applicants
+// @route   GET /api/admin/internship-applicants
+// @access  Private/Admin
+const getInternshipApplicants = asyncHandler(async (req, res) => {
+    const users = await User.find({ 
+        internshipInterests: { $exists: true, $not: { $size: 0 } } 
+    }, 'fullName email phoneNo internshipInterests createdAt');
+
+    res.status(200).json(new ApiResponse(200, { users }, "Internship applicants fetched successfully"));
+});
+
 module.exports = {
     loginAdmin,
     getAllUsers,
     downloadUserResume,
     exportUsersCSV,
     exportNewUsersCSV,
-    getUserStats
+    getUserStats,
+    getInternshipApplicants
 };

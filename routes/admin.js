@@ -6,7 +6,8 @@ const {
     downloadUserResume,
     exportUsersCSV,
     exportNewUsersCSV,
-    getUserStats
+    getUserStats,
+    getInternshipApplicants
 } = require("../controllers/admin.controller");
 const verifyJWT = require("../middlewares/auth.middelware");
 
@@ -24,5 +25,8 @@ router.post('/users/:id/download-resume', verifyJWT, (req, res, next) => {
 router.get('/users/export/csv', verifyJWT, exportUsersCSV);
 router.get('/users/export/csv/new', verifyJWT, exportNewUsersCSV);
 router.get('/users/stats', verifyJWT, getUserStats);
+
+// Internship applicants route
+router.get('/internship-applicants', verifyJWT, getInternshipApplicants);
 
 module.exports = router;
