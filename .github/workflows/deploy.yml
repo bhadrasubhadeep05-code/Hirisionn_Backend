@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
           script: |
-            cd 'public_html/MyApp'
+            cd 'domains/hirisionn.com/public_html/MyApp'
             npm install
             npm run build
 
