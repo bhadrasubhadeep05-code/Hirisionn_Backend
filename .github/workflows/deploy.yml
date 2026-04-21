@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
           local_path: '.'
-          remote_path: 'public_html/MyApp'
+          remote_path: '/home/ffobvsfz/domains/hirisionn.com/public_html/MyApp'
 
       - name: SSH and run commands
         uses: appleboy/ssh-action@v1.0.3
@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
           script: |
-            cd 'domains/hirisionn.com/public_html/MyApp'
+            cd '/home/ffobvsfz/domains/hirisionn.com/public_html/MyApp'
             npm install
             npm run build
 
