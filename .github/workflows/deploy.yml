@@ -34,4 +34,3 @@ jobs:
             cd '/home/ffobvsfz/domains/hirisionn.com/public_html/MyApp'
             npm install
             npm run build
-
