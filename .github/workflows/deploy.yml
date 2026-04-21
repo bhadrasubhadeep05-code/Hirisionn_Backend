@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-steps:
+    steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
@@ -23,7 +23,7 @@ steps:
           local_path: './'
           remote_path: 'public_html/MyApp'
 
-       - name: SSH and run commands
+      - name: SSH and run commands
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SFTP_HOST }}
