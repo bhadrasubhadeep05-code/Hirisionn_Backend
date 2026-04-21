@@ -5,7 +5,6 @@ const ApiError = require('../utils/ApiError.js');
 const asyncHandler = require('../utils/asyncHandler.js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const fetch = require('node-fetch');
 
 const generateToken = (userId) => {
   return jwt.sign(
