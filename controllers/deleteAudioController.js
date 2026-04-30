@@ -2,7 +2,7 @@ const Audio = require("../models/Audio.model");
 const { deleteImageDirect } = require("./deleteImageController");
 const ApiError = require("../utils/ApiError");
 
-const deleteVideo = async (req, res, next) => {
+const deleteAudio = async (req, res, next) => {
     try {
         const { audioId } = req.params;
         
@@ -11,11 +11,10 @@ const deleteVideo = async (req, res, next) => {
         }
 
         // Find video first
-        const audio = await Audio.findById(videoId);
+        const audio = await Audio.findById(audioId);
         if (!audio) {
             return next(new ApiError( "Audio not found", 404));
         }
-
         // Delete video from database
         await Audio.findByIdAndDelete(audioId);
 
@@ -26,6 +25,7 @@ const deleteVideo = async (req, res, next) => {
 
     } catch (error) {
         console.error("Error deleting video:", error);
-        return next(new ApiError( "Failed to delete video", 500, error));
+        return next(new ApiError( "Failed to delete audio", 500, error));
     }
 };
+module.exports = {deleteAudio}

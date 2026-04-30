@@ -4,7 +4,7 @@ const Audio = require("../models/Audio.model");
 
 // Create Audio Controller
 exports.createAudioCon = asyncHandler(async (req, res) => {
-  const { title, description, youtubeLink, author, category } = req.body;
+  const { title, description, youtubeLink, author, category, subCategory } = req.body;
 
   // Validation
   if (!title || typeof title !== "string" || title.trim().length < 5) {
@@ -26,6 +26,7 @@ exports.createAudioCon = asyncHandler(async (req, res) => {
     vid_link: youtubeLink,
     authorName: author || "Admin",
     category,
+    subCategory
   });
 
   res.status(201).json({

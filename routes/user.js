@@ -37,50 +37,77 @@ router.get('/getUser', verifyJWT, getUser);
 router.put('/update', verifyJWT, validateUpdateProfile, updateProfile);
 
 // Record internship application interest
-router.post('/apply-internship', verifyJWT, async (req, res) => {
+router.post("/apply-internship", verifyJWT, async (req, res) => {
   try {
     const { category, subCategory } = req.body;
-    
-    if (!category || !subCategory) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Category and subCategory are required" 
+
+    // Validate required field
+    if (!category) {
+      return res.status(400).json({
+        success: false,
+        message: "Category is required",
       });
     }
 
-    await User.findByIdAndUpdate(req.user._id, {
-      $push: {
-        internshipInterests: { category, subCategory }
-      }
+    // Get current user
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Ensure internshipInterests exists
+    const internshipInterests = user.internshipInterests || [];
+
+    // Restrict max 2 applications
+    if (internshipInterests.length >= 2) {
+      return res.status(400).json({
+        success: false,
+        message: "You can apply for a maximum of 2 internships only",
+      });
+    }
+
+    // Prevent duplicate application for same category + subCategory
+    const alreadyApplied = internshipInterests.some(
+      (item) =>
+        item.category === category &&
+        item.subCategory === subCategory
+    );
+
+    if (alreadyApplied) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already applied for this internship",
+      });
+    }
+
+    // Save new internship interest
+    user.internshipInterests.push({
+      category,
+      subCategory,
+      status: "Applied",
     });
 
-    res.status(200).json({ 
-      success: true, 
-      message: "Internship interest recorded successfully" 
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Internship interest recorded successfully",
     });
   } catch (error) {
     console.error("Apply internship error:", error);
-    res.status(500).json({ 
-      success: false, 
+
+    return res.status(500).json({
+      success: false,
       message: "Failed to record interest",
-      error: error.message 
+      error: error.message,
     });
   }
 });
 
-// Admin route to get all internship applicants
-router.get('/admin/internship-applicants', verifyJWT, async (req, res) => {
-  try {
-    // Get all users that have internship interests
-    const users = await User.find({ 
-      internshipInterests: { $exists: true, $not: { $size: 0 } } 
-    }, 'fullName email internshipInterests');
 
-    res.status(200).json({ success: true, users });
-  } catch (error) {
-    console.error("Fetch applicants error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch applicants" });
-  }
-});
 
 module.exports = router;

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const {getAllInterviewBlogCon, getAllIndustryBlogCon, getAllOtherBlogsCon} = require("../controllers/getAllBlogsController");
+const {getBlogsBlogCon, getWorkforceInsightsBlogCon, getIndustryInsightsBlogCon} = require("../controllers/getAllBlogsController");
 
 
-router.get('/interview', getAllInterviewBlogCon);
-router.get('/industry', getAllIndustryBlogCon);
-router.get('/other', getAllOtherBlogsCon);
+router.get('/BlogData', getBlogsBlogCon);
+router.get('/workforce', getWorkforceInsightsBlogCon);
+router.get('/industry', getIndustryInsightsBlogCon);
 
 module.exports = router;

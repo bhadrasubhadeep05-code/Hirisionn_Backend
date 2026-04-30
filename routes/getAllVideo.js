@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const {getAllInterviewVideoCon, getAllIndustryVideoCon, getAllOtherVideosCon} = require("../controllers/getAllVideosController");
+const {getVideoCon, getWorkforceInsightsVideoCon, getIndustryInsightsVideoCon} = require("../controllers/getAllVideosController");
 
 
-router.get('/interview', getAllInterviewVideoCon);
-router.get('/industry', getAllIndustryVideoCon);
-router.get('/other', getAllOtherVideosCon);
+router.get('/videoData', getVideoCon);
+router.get('/industry', getIndustryInsightsVideoCon);
+router.get('/workforce', getWorkforceInsightsVideoCon);
 
 module.exports = router;

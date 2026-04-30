@@ -7,7 +7,18 @@ const {
     exportUsersCSV,
     exportNewUsersCSV,
     getUserStats,
-    getInternshipApplicants
+    getInternshipApplicants,
+    markInternshipAsFulfilled,
+    getInternshipFulFilled,
+  updateJobPlacementStatus,
+  getJobPlacementStatus,
+  markJobPlacementAsFulfilled,
+  liveProjectApplication,
+  getLiveProjectStatus,
+  markLiveProjectAsFulfilled,
+  softSkillApplication,
+  getSoftSkillStatus,
+  markSoftSkillAsFulfilled
 } = require("../controllers/admin.controller");
 const verifyJWT = require("../middlewares/auth.middelware");
 
@@ -28,5 +39,23 @@ router.get('/users/stats', verifyJWT, getUserStats);
 
 // Internship applicants route
 router.get('/internship-applicants', verifyJWT, getInternshipApplicants);
+router.put('/internship-status', verifyJWT, markInternshipAsFulfilled);
+router.get('/internship-fulfill', verifyJWT, getInternshipFulFilled);
+
+//JobPlacement Routes
+router.put('/jobplacement', verifyJWT, updateJobPlacementStatus);
+router.get('/jobplacement-applicants', verifyJWT, getJobPlacementStatus);
+router.put('/jobplacement-status', verifyJWT, markJobPlacementAsFulfilled);
+
+//Live Project Routes
+router.put('/liveproject', verifyJWT, liveProjectApplication);
+router.get('/liveproject-applicants', verifyJWT, getLiveProjectStatus);
+router.put('/liveproject-status', verifyJWT, markLiveProjectAsFulfilled);
+
+//Soft Skill Routes
+router.put('/softskills', verifyJWT, softSkillApplication);
+router.get('/softskills-applicants', verifyJWT, getSoftSkillStatus);
+router.put('/softskills-status', verifyJWT, markSoftSkillAsFulfilled);
+
 
 module.exports = router;

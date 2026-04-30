@@ -11,9 +11,11 @@ const getLatestBlog = require("./routes/getLatestBlog");
 const getLatestVideo = require("./routes/getLatestVideo");
 const getAllBlogs = require("./routes/getAllBlogs");
 const getAllVideos = require("./routes/getAllVideo");
+const getAllAudio = require("./routes/getAllAudio.js")
 const user = require("./routes/user.js");
 const admin = require("./routes/admin.js");
 const createAudio = require("./routes/createAudioRoutes");
+const business = require("./routes/Business.js")
 const cookieParser = require("cookie-parser");
 const cors =  require("cors");
 const ApiError = require("./utils/ApiError.js")
@@ -23,12 +25,24 @@ const helmet = require("helmet");
 app.use(helmet());
 
 app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://hirisionn.com"
+];
+
 app.use(cors({
-    origin: "https://hirisionn.com",
-    credentials: true,
+  origin: function (origin, callback) {
+    // allow Postman / server-to-server (no origin)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
 }));
-app.use(cookieParser());
 
 
 //to check helth
@@ -55,10 +69,12 @@ app.use("/api/getlatestblog", getLatestBlog);
 //get video for landing page
 app.use("/api/getlatestvideo", getLatestVideo);
 // get all blogs
-app.use("/api/getallblogs", getAllBlogs);
+app.use("/api/blog", getAllBlogs);
 // get all videos
-app.use("/api/getallvideos", getAllVideos);
+app.use("/api/video", getAllVideos);
 // get all audio
+app.use("/api/audio", getAllAudio);
+//create audio
 app.use("/api/createaudio", createAudio);
 // user creat account
 app.use("/api/createuser", user);
@@ -70,6 +86,8 @@ app.use("/api/createaudio", createAudio);
 app.use("/api/complete", user);
 // admin routes
 app.use("/api/admin", admin);
+// business routes
+app.use("/api/enquiry", business );
 
 
 const errorMiddelware = require("./middlewares/errorMiddelware");

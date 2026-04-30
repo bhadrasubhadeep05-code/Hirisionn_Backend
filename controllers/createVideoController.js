@@ -3,13 +3,14 @@ const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 
 exports.createVideo = asyncHandler(async (req, res)=>{
-  const {title, description, vid_link, category} = req.body;
+  const {title, description, vid_link, category, subCategory} = req.body;
 
     const video = await Video.create({
         title,
         description,
         vid_link,
         category,
+        subCategory
     });
 
     res.status(200).json({
