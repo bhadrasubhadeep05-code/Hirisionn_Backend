@@ -62,13 +62,7 @@ router.post("/apply-internship", verifyJWT, async (req, res) => {
     // Ensure internshipInterests exists
     const internshipInterests = user.internshipInterests || [];
 
-    // Restrict max 2 applications
-    if (internshipInterests.length >= 2) {
-      return res.status(400).json({
-        success: false,
-        message: "You can apply for a maximum of 2 internships only",
-      });
-    }
+ 
 
     // Prevent duplicate application for same category + subCategory
     const alreadyApplied = internshipInterests.some(
