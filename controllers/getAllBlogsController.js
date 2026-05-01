@@ -84,3 +84,41 @@ exports.getIndustryInsightsBlogCon = asyncHandler(async(req,res)=>{
         count: blogs.length,
     });
 });
+
+exports.getBlogById = asyncHandler(async(req, res)=>{
+     try {
+    const { id } = req.params;
+
+    // validation
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Blog ID is required",
+      });
+    }
+
+    // find blog
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog fetched successfully",
+      blog,
+    });
+  } catch (error) {
+    console.error("Get Blog By ID Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+
+})

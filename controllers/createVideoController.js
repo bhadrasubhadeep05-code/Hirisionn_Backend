@@ -4,7 +4,7 @@ const asyncHandler = require("../utils/asyncHandler");
 
 exports.createVideo = asyncHandler(async (req, res)=>{
   const {title, description, vid_link, category, subCategory} = req.body;
-
+    console.log("heloo")
     const video = await Video.create({
         title,
         description,

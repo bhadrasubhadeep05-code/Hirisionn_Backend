@@ -3,8 +3,8 @@ const router = express.Router();
 const {getAudioCon, getWorkforceInsightsAudioCon, getIndustryInsightsAudioCon} = require("../controllers/getAllAudioController");
 
 
-router.get('/blogs', getAudioCon);
-router.get('/workforce-insights', getWorkforceInsightsAudioCon);
-router.get('/industry-insights', getIndustryInsightsAudioCon);
+router.get('/audioData', getAudioCon);
+router.get('/industry', getIndustryInsightsAudioCon);
+router.get('/workforce', getWorkforceInsightsAudioCon);
 
 module.exports = router;
