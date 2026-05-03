@@ -194,30 +194,69 @@ exports.resetPassword = asyncHandler(async (req, res) => {
     message: "Password has been reset successfully"
   });
 });
+
+// Get complete user data (well-structured)
 exports.getUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select("-password -securityQuestions");
-  
+  const user = await User.findById(req.user._id)
+    .select("-password -securityQuestions");
+
   if (!user) {
     throw new ApiError("User not found", 404);
   }
 
-  // ✅ Return flat user object directly (matches frontend expectations)
-  res.json({
-    _id: user._id,
-    fullName: user.fullName,
-    phoneNo: user.phoneNo,
-    email: user.email,
-    isProfileComplete: user.isProfileComplete,
-    profileComplete: user.isProfileComplete,
-    experienceLevel: user.profile?.experienceLevel || "",
-    job: user.profile?.job || "",
-    employer: user.profile?.employer || "",
-    currentCTC: user.profile?.currentCTC || "",
-    course: user.profile?.course || "",
-    domain: user.profile?.domain || "",
-    education: user.profile?.education || "",
-    linkedin: user.profile?.linkedin || "",
-    resume: user.profile?.resume || null,
+  res.status(200).json({
+    success: true,
+    message: "User data fetched successfully",
+
+    user: {
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      phoneNo: user.phoneNo,
+
+      isProfileComplete: user.isProfileComplete,
+      downloaded: user.downloaded || false,
+
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+
+      // Profile Section
+      profile: {
+        experienceLevel: user.profile?.experienceLevel || "",
+        job: user.profile?.job || "",
+        employer: user.profile?.employer || "",
+        currentCTC: user.profile?.currentCTC || "",
+        course: user.profile?.course || "",
+        domain: user.profile?.domain || "",
+        education: user.profile?.education || "",
+        linkedin: user.profile?.linkedin || "",
+        resume: user.profile?.resume || null,
+      },
+
+      // Internship Section
+      internshipInterests: user.internshipInterests || [],
+
+      // Job Placement Section
+      jobPlacement: {
+        applied: user.jobPlacement?.applied || false,
+        appliedAt: user.jobPlacement?.appliedAt || null,
+        status: user.jobPlacement?.status || "Pending",
+      },
+
+      // Live Project Section
+      liveProject: {
+        applied: user.liveProject?.applied || false,
+        appliedAt: user.liveProject?.appliedAt || null,
+        status: user.liveProject?.status || "Pending",
+      },
+
+      // Soft Skill Section
+      softSkill: {
+        applied: user.softSkill?.applied || false,
+        appliedAt: user.softSkill?.appliedAt || null,
+        status: user.softSkill?.status || "Pending",
+      },
+    },
   });
 });
 
