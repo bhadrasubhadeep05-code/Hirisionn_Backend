@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
     loginAdmin,
+    logoutAdmin,
     getAllUsers,
     downloadUserResume,
     exportUsersCSV,
@@ -23,6 +24,7 @@ const {
 const verifyJWT = require("../middlewares/auth.middelware");
 
 router.post('/loginAdmin', loginAdmin);
+router.post('/logout', logoutAdmin);
 
 // Protected admin routes
 router.get('/users', verifyJWT, getAllUsers);

@@ -8,6 +8,7 @@ const {
   verifyUserForReset,
   verifySecurityAnswers,
   resetPassword,
+  logoutUser,
   getUser,
   updateProfile
 } = require("../controllers/user.controller");
@@ -24,6 +25,7 @@ const {
 
 router.post('/register', validateRegister, registerUser);
 router.post('/login', validateLogin, loginUser);
+router.post('/logout', logoutUser);
 router.put('/profile', verifyJWT, completeProfile);
 
 // Forgot Password Routes

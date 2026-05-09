@@ -7,7 +7,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 const generateToken = (userId) => {
-  return jwt.sign({ _id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ _id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 };
 
 // @desc    Admin Login
@@ -34,9 +36,31 @@ const loginAdmin = asyncHandler(async (req, res) => {
 
   const adminToken = generateToken(user._id);
 
+  if (process.env.NODE_ENV === "production") {
+    res.cookie("token", adminToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+
   return res.json({
     adminToken,
     succes: true,
+  });
+});
+
+const logoutAdmin = asyncHandler(async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Admin logged out successfully",
   });
 });
 
@@ -887,6 +911,7 @@ const getInternshipFulFilled = asyncHandler(async (req, res) => {
 
 module.exports = {
   loginAdmin,
+  logoutAdmin,
   getAllUsers,
   downloadUserResume,
   exportUsersCSV,

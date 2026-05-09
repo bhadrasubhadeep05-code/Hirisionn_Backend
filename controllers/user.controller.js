@@ -60,7 +60,7 @@ exports.registerUser = asyncHandler(async(req, res)=>{
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 1 * 24 * 60 * 60 * 1000,
     });
   }
 
@@ -97,7 +97,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 1 * 24 * 60 * 60 * 1000,
     });
   }
 
@@ -212,6 +212,19 @@ exports.resetPassword = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: "Password has been reset successfully"
+  });
+});
+
+exports.logoutUser = asyncHandler(async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None",
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
   });
 });
 
