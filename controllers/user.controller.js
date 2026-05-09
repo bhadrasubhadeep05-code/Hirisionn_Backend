@@ -54,6 +54,16 @@ exports.registerUser = asyncHandler(async(req, res)=>{
 
   const token = generateToken(user._id); 
 
+  // In production, issue the JWT as an HTTP-only cookie.
+  if (process.env.NODE_ENV === "production") {
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+
   res.json({
   token,
   isProfileComplete: false,
@@ -80,6 +90,16 @@ exports.loginUser = asyncHandler(async (req, res) => {
   }
 
   const token = generateToken(user._id);
+
+  // In production, issue the JWT as an HTTP-only cookie.
+  if (process.env.NODE_ENV === "production") {
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
 
   return res.json({
     token,

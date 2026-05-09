@@ -3,7 +3,9 @@ const ApiError = require("../utils/ApiError")
 
 const verifyJWT = async (req, res, next) => {
   try{
-  const token = req.header("Authorization")?.replace("Bearer ", "");
+  const tokenFromHeader = req.header("Authorization")?.replace("Bearer ", "");
+  const tokenFromCookie = req.cookies?.token;
+  const token = tokenFromCookie || tokenFromHeader;
 
   if (!token) {
     return res.status(401).json({ message: "No token provided" });

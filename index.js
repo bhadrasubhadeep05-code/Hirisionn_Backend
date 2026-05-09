@@ -44,6 +44,7 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use(cookieParser());
 
 //to check helth
 app.get("/helth", (req, res)=>{
