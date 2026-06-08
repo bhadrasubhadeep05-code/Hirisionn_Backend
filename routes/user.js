@@ -22,17 +22,16 @@ const {
   validateSecurityAnswers,
   validateResetPassword
 } = require("../middlewares/validateUser");
-const { loginLimiter, registerLimiter, passwordResetLimiter } = require("../middlewares/rateLimiter.js");
 
-router.post('/register', registerLimiter, validateRegister, registerUser);
-router.post('/login', loginLimiter, validateLogin, loginUser);
+router.post('/register', validateRegister, registerUser);
+router.post('/login', validateLogin, loginUser);
 router.post('/logout', logoutUser);
 router.put('/profile', verifyJWT, completeProfile);
 
 // Forgot Password Routes
 router.post('/forgot-password/verify-user', validateVerifyUser, verifyUserForReset);
 router.post('/forgot-password/verify-answers', validateSecurityAnswers, verifySecurityAnswers);
-router.post('/forgot-password/reset', passwordResetLimiter, validateResetPassword, resetPassword);
+router.post('/forgot-password/reset', validateResetPassword, resetPassword);
 
 //get User Route
 router.get('/getUser', verifyJWT, getUser);
