@@ -22,7 +22,12 @@ const ApiError = require("./utils/ApiError.js")
 connectDB();
 require("dotenv").config();
 const helmet = require("helmet");
+const { globalLimiter } = require("./middlewares/rateLimiter.js");
+
+
+app.set("trust proxy", 1);
 app.use(helmet());
+app.use(globalLimiter);
 
 app.use(express.json({ limit: "10mb" }));
 const allowedOrigins = [
