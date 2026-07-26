@@ -23,11 +23,12 @@ connectDB();
 require("dotenv").config();
 const helmet = require("helmet");
 app.use(helmet());
-
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "10mb" }));
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://hirisionn.com"
+  "https://hirisionn.com",
+  "https://www.hirisionn.com",
 ];
 
 app.use(cors({
