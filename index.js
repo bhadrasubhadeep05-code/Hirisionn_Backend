@@ -15,7 +15,8 @@ const getAllAudio = require("./routes/getAllAudio.js")
 const user = require("./routes/user.js");
 const admin = require("./routes/admin.js");
 const createAudio = require("./routes/createAudioRoutes");
-const business = require("./routes/Business.js")
+const business = require("./routes/Business.js");
+const job = require("./routes/job.js")
 const cookieParser = require("cookie-parser");
 const cors =  require("cors");
 const ApiError = require("./utils/ApiError.js")
@@ -90,6 +91,8 @@ app.use("/api/complete", user);
 app.use("/api/admin", admin);
 // business routes
 app.use("/api/enquiry", business );
+// job routes
+app.use('/api/admin/job', job)
 
 
 const errorMiddelware = require("./middlewares/errorMiddelware");

@@ -11,12 +11,6 @@ const {
     getInternshipApplicants,
     markInternshipAsFulfilled,
     getInternshipFulFilled,
-  updateJobPlacementStatus,
-  getJobPlacementStatus,
-  markJobPlacementAsFulfilled,
-  liveProjectApplication,
-  getLiveProjectStatus,
-  markLiveProjectAsFulfilled,
   softSkillApplication,
   getSoftSkillStatus,
   markSoftSkillAsFulfilled
@@ -44,15 +38,6 @@ router.get('/internship-applicants', verifyJWT, getInternshipApplicants);
 router.put('/internship-status', verifyJWT, markInternshipAsFulfilled);
 router.get('/internship-fulfill', verifyJWT, getInternshipFulFilled);
 
-//JobPlacement Routes
-router.put('/jobplacement', verifyJWT, updateJobPlacementStatus);
-router.get('/jobplacement-applicants', verifyJWT, getJobPlacementStatus);
-router.put('/jobplacement-status', verifyJWT, markJobPlacementAsFulfilled);
-
-//Live Project Routes
-router.put('/liveproject', verifyJWT, liveProjectApplication);
-router.get('/liveproject-applicants', verifyJWT, getLiveProjectStatus);
-router.put('/liveproject-status', verifyJWT, markLiveProjectAsFulfilled);
 
 //Soft Skill Routes
 router.put('/softskills', verifyJWT, softSkillApplication);

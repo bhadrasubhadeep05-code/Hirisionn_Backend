@@ -270,11 +270,7 @@ exports.getUser = asyncHandler(async (req, res) => {
       internshipInterests: user.internshipInterests || [],
 
       // Job Placement Section
-      jobPlacement: {
-        applied: user.jobPlacement?.applied || false,
-        appliedAt: user.jobPlacement?.appliedAt || null,
-        status: user.jobPlacement?.status || "Pending",
-      },
+    jobPlacement: user.jobPlacement || [],
 
       // Live Project Section
       liveProject: {

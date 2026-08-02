@@ -71,35 +71,16 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
-    liveProject: {
-      applied: {
-        type: Boolean,
-        default: false,
+    jobPlacement: [
+      {
+        jobId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Job",
+        },
+        jobTitle: String,
+        status: String,
       },
-      status: {
-        type: String,
-        default: "Not Applied",
-      },
-      appliedAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-
-    jobPlacement: {
-      applied: {
-        type: Boolean,
-        default: false,
-      },
-      status: {
-        type: String,
-        default: "Not Applied",
-      },
-      appliedAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
+    ],
 
     softSkill: {
       applied: {
