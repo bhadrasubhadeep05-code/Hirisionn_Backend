@@ -33,10 +33,12 @@ const validateJob = (req, res, next) => {
     }
 
     // CTC validation
-    if (CTC === undefined || CTC === null || typeof CTC !== "string") {
+    if (CTC === undefined || CTC === null || (typeof CTC !== "string" && typeof CTC !== "number")) {
       return res.status(400).json(new ApiResponse(400, null, "CTC is required"));
     }
-    if (isNaN(Number(CTC)) || Number(CTC) < 0) {
+
+    const normalizedCtc = typeof CTC === "number" ? CTC : Number(CTC);
+    if (isNaN(normalizedCtc) || normalizedCtc < 0) {
       return res.status(400).json(new ApiResponse(400, null, "CTC must be a valid non-negative number"));
     }
 
@@ -82,15 +84,15 @@ const validateJob = (req, res, next) => {
       return res.status(400).json(new ApiResponse(400, null, "Experience is required and must be a non-empty string"));
     }
 
-    if(!active || typeof active !== "boolean"){
-      return res.status(400).json(new ApiResponse(400, null, "Active is required and must be a Boolean"));
+    if (active !== undefined && active !== null && typeof active !== "boolean") {
+      return res.status(400).json(new ApiResponse(400, null, "Active must be a Boolean"));
     }
 
     // Sanitize and attach validated data to request
     req.validatedJobData = {
       jobTitle: jobTitle.trim(),
       jobDescription: jobDescription.trim(),
-      CTC: Number(CTC),
+      CTC: String(normalizedCtc),
       deadLine: new Date(deadLine),
       industries: industries.trim(),
       location: location.trim(),
@@ -98,6 +100,7 @@ const validateJob = (req, res, next) => {
       jobType: jobType.trim(),
       eligibility: eligibility.trim(),
       experience: experience.trim(),
+      active: typeof active === "boolean" ? active : true,
     };
 
     next();

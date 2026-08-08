@@ -10,6 +10,7 @@ const bcrypt = require("bcryptjs");
 
 exports.createJob = asyncHandler(async (req, res) => {
   try {
+    const validatedData = req.validatedJobData || req.body;
     const {
       jobTitle,
       jobDescription,
@@ -22,12 +23,12 @@ exports.createJob = asyncHandler(async (req, res) => {
       eligibility,
       experience,
       active,
-    } = req.body;
+    } = validatedData;
 
     const jobData = await Job.create({
       jobTitle,
       jobDescription,
-      CTC,
+      CTC: String(CTC),
       deadLine,
       industries,
       location,
@@ -35,7 +36,7 @@ exports.createJob = asyncHandler(async (req, res) => {
       jobType,
       eligibility,
       experience,
-      active,
+      active: typeof active === "boolean" ? active : true,
     });
 
     res.status(200).json({
