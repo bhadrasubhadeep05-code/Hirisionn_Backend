@@ -33,7 +33,7 @@ const validateJob = (req, res, next) => {
     }
 
     // CTC validation
-    if (CTC === undefined || CTC === null || CTC === "") {
+    if (CTC === undefined || CTC === null || typeof CTC !== "string") {
       return res.status(400).json(new ApiResponse(400, null, "CTC is required"));
     }
     if (isNaN(Number(CTC)) || Number(CTC) < 0) {

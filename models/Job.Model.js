@@ -16,7 +16,7 @@ const jobSchema = new mongoose.Schema(
     },
     CTC: {
       required: true,
-      type: Number,
+      type: String,
       trim: true,
     },
     deadLine: {
