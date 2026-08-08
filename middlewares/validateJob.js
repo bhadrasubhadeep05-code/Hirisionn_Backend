@@ -37,9 +37,9 @@ const validateJob = (req, res, next) => {
       return res.status(400).json(new ApiResponse(400, null, "CTC is required"));
     }
 
-    const normalizedCtc = typeof CTC === "number" ? CTC : Number(CTC);
-    if (isNaN(normalizedCtc) || normalizedCtc < 0) {
-      return res.status(400).json(new ApiResponse(400, null, "CTC must be a valid non-negative number"));
+    const normalizedCtc = typeof CTC === "string" ? CTC.trim() : String(CTC).trim();
+    if (!normalizedCtc) {
+      return res.status(400).json(new ApiResponse(400, null, "CTC is required"));
     }
 
     // deadLine validation
@@ -92,7 +92,7 @@ const validateJob = (req, res, next) => {
     req.validatedJobData = {
       jobTitle: jobTitle.trim(),
       jobDescription: jobDescription.trim(),
-      CTC: String(normalizedCtc),
+      CTC: normalizedCtc,
       deadLine: new Date(deadLine),
       industries: industries.trim(),
       location: location.trim(),
