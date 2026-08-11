@@ -16,8 +16,21 @@ const {
   markSoftSkillAsFulfilled
 } = require("../controllers/admin.controller");
 const verifyJWT = require("../middlewares/auth.middelware");
+const rateLimit = require("express-rate-limit");
 
-router.post('/loginAdmin', loginAdmin);
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many login attempts. Please try again later.",
+  },
+});
+
+router.post('/loginAdmin',loginLimiter, loginAdmin);
 router.post('/logout', logoutAdmin);
 
 // Protected admin routes

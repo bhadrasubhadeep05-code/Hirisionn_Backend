@@ -22,16 +22,51 @@ const {
   validateSecurityAnswers,
   validateResetPassword
 } = require("../middlewares/validateUser");
+const rateLimit = require("express-rate-limit");
 
-router.post('/register', validateRegister, registerUser);
-router.post('/login', validateLogin, loginUser);
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many login attempts. Please try again later.",
+  },
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 30 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many registration attempts. Please try again later.",
+  },
+});
+
+const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many password reset attempts. Please try again later.",
+  },
+});
+
+router.post('/register', registerLimiter, validateRegister, registerUser);
+router.post('/login', loginLimiter, validateLogin, loginUser);
 router.post('/logout', logoutUser);
 router.put('/profile', verifyJWT, completeProfile);
 
 // Forgot Password Routes
-router.post('/forgot-password/verify-user', validateVerifyUser, verifyUserForReset);
-router.post('/forgot-password/verify-answers', validateSecurityAnswers, verifySecurityAnswers);
-router.post('/forgot-password/reset', validateResetPassword, resetPassword);
+router.post('/forgot-password/verify-user', passwordResetLimiter, validateVerifyUser, verifyUserForReset);
+router.post('/forgot-password/verify-answers', passwordResetLimiter, validateSecurityAnswers, verifySecurityAnswers);
+router.post('/forgot-password/reset', passwordResetLimiter, validateResetPassword, resetPassword);
 
 //get User Route
 router.get('/getUser', verifyJWT, getUser);

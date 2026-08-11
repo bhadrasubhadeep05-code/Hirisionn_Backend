@@ -77,16 +77,15 @@ exports.loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ phoneNo });
 
   if (!user) {
-    throw new ApiError("User not found", 409);
+    // Keep the message generic so we don't reveal whether a phone number exists
+    throw new ApiError("Invalid credentials", 401);
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    return res.json({
-      succes:false,
-      message: "Incorect Password"
-    })
+    // Same generic message as "user not found" — no information leak
+    throw new ApiError("Invalid credentials", 401);
   }
 
   const token = generateToken(user._id);
