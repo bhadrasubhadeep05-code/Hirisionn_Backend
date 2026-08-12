@@ -134,7 +134,7 @@ exports.Applyjob = asyncHandler(async (req, res) => {
 
     if (!job) {
       return res.status(404).json({
-        errpr: "Job not found",
+        error: "Job not found",
       });
     }
 
@@ -348,5 +348,92 @@ exports.jobActiveToggel = asyncHandler(async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+});
+
+// updateJob 
+exports.updateJob = asyncHandler(async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const validatedData = req.validatedJobData;
+
+    // Find the existing job
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json(
+        new ApiResponse(
+          404,
+          null,
+          "Job post not found"
+        )
+      );
+    }
+
+    // Update only the fields that were provided
+    if (validatedData.jobTitle !== undefined) {
+      job.jobTitle = validatedData.jobTitle;
+    }
+
+    if (validatedData.jobDescription !== undefined) {
+      job.jobDescription = validatedData.jobDescription;
+    }
+
+    if (validatedData.CTC !== undefined) {
+      job.CTC = String(validatedData.CTC);
+    }
+
+    if (validatedData.deadLine !== undefined) {
+      job.deadLine = validatedData.deadLine;
+    }
+
+    if (validatedData.industries !== undefined) {
+      job.industries = validatedData.industries;
+    }
+
+    if (validatedData.location !== undefined) {
+      job.location = validatedData.location;
+    }
+
+    if (validatedData.domain !== undefined) {
+      job.domain = validatedData.domain;
+    }
+
+    if (validatedData.jobType !== undefined) {
+      job.jobType = validatedData.jobType;
+    }
+
+    if (validatedData.eligibility !== undefined) {
+      job.eligibility = validatedData.eligibility;
+    }
+
+    if (validatedData.experience !== undefined) {
+      job.experience = validatedData.experience;
+    }
+
+    if (validatedData.active !== undefined) {
+      job.active = validatedData.active;
+    }
+
+    // Save updated job
+    const updatedJob = await job.save();
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        updatedJob,
+        "Job post updated successfully"
+      )
+    );
+
+  } catch (error) {
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        "Something went wrong when updating the job post: " +
+          error.message
+      )
+    );
   }
 });
