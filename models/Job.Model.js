@@ -66,7 +66,7 @@ const jobSchema = new mongoose.Schema(
     },
   },
 ],
-  fromLink:{
+  formLink: {
     type: String,
   }
   },
