@@ -11,6 +11,7 @@ const validateUpdateJob = (req, res, next) => {
     eligibility,
     experience,
     active,
+    formLink,
   } = req.body;
 
   const errors = {};
@@ -20,14 +21,17 @@ const validateUpdateJob = (req, res, next) => {
     errors.general = "At least one field is required to update the job";
   }
 
-  // jobTitle
+  // Job Title
   if (jobTitle !== undefined) {
-    if (typeof jobTitle !== "string" || jobTitle.trim().length < 3) {
+    if (
+      typeof jobTitle !== "string" ||
+      jobTitle.trim().length < 3
+    ) {
       errors.jobTitle = "Job title must be at least 3 characters";
     }
   }
 
-  // jobDescription
+  // Job Description
   if (jobDescription !== undefined) {
     if (
       typeof jobDescription !== "string" ||
@@ -59,7 +63,10 @@ const validateUpdateJob = (req, res, next) => {
 
   // Industries
   if (industries !== undefined) {
-    if (typeof industries !== "string" || industries.trim().length === 0) {
+    if (
+      typeof industries !== "string" ||
+      industries.trim().length === 0
+    ) {
       errors.industries = "Industries must be a non-empty string";
     }
   }
@@ -84,7 +91,7 @@ const validateUpdateJob = (req, res, next) => {
     }
   }
 
-  // Job type
+  // Job Type
   if (jobType !== undefined) {
     if (
       typeof jobType !== "string" ||
@@ -121,6 +128,27 @@ const validateUpdateJob = (req, res, next) => {
     }
   }
 
+  // Form Link
+  if (formLink !== undefined) {
+    if (
+      typeof formLink !== "string" ||
+      formLink.trim().length === 0
+    ) {
+      errors.formLink = "Form link must be a non-empty string";
+    } else {
+      try {
+        const url = new URL(formLink.trim());
+
+        if (!["http:", "https:"].includes(url.protocol)) {
+          errors.formLink =
+            "Form link must be a valid HTTP or HTTPS URL";
+        }
+      } catch (error) {
+        errors.formLink = "Form link must be a valid URL";
+      }
+    }
+  }
+
   // Return validation errors
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({
@@ -132,23 +160,53 @@ const validateUpdateJob = (req, res, next) => {
 
   // Store validated data
   req.validatedJobData = {
-    ...(jobTitle !== undefined && { jobTitle: jobTitle.trim() }),
+    ...(jobTitle !== undefined && {
+      jobTitle: jobTitle.trim(),
+    }),
+
     ...(jobDescription !== undefined && {
       jobDescription: jobDescription.trim(),
     }),
-    ...(CTC !== undefined && { CTC }),
-    ...(deadLine !== undefined && { deadLine }),
-    ...(industries !== undefined && { industries: industries.trim() }),
-    ...(location !== undefined && { location: location.trim() }),
-    ...(domain !== undefined && { domain: domain.trim() }),
-    ...(jobType !== undefined && { jobType: jobType.trim() }),
+
+    ...(CTC !== undefined && {
+      CTC,
+    }),
+
+    ...(deadLine !== undefined && {
+      deadLine,
+    }),
+
+    ...(industries !== undefined && {
+      industries: industries.trim(),
+    }),
+
+    ...(location !== undefined && {
+      location: location.trim(),
+    }),
+
+    ...(domain !== undefined && {
+      domain: domain.trim(),
+    }),
+
+    ...(jobType !== undefined && {
+      jobType: jobType.trim(),
+    }),
+
     ...(eligibility !== undefined && {
       eligibility: eligibility.trim(),
     }),
+
     ...(experience !== undefined && {
       experience: experience.trim(),
     }),
-    ...(active !== undefined && { active }),
+
+    ...(active !== undefined && {
+      active,
+    }),
+
+    ...(formLink !== undefined && {
+      formLink: formLink.trim(),
+    }),
   };
 
   next();

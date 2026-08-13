@@ -13,7 +13,8 @@ const validateJob = (req, res, next) => {
       jobType,
       eligibility,
       experience,
-      active
+      active,
+      formLink
     } = req.body;
 
     // jobTitle validation
@@ -27,10 +28,26 @@ const validateJob = (req, res, next) => {
       return res.status(400).json(new ApiResponse(400, null, "Job title must not exceed 150 characters"));
     }
 
-    // jobDescription validation
-    if (!jobDescription || typeof jobDescription !== "string" || !jobDescription.trim()) {
-      return res.status(400).json(new ApiResponse(400, null, "Job description is required and must be a non-empty string"));
+   // Job Description
+if (jobDescription !== undefined) {
+  if (typeof jobDescription !== "string") {
+    errors.jobDescription = "Job description must be a string";
+  } else {
+    const plainText = jobDescription
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (plainText.length < 10) {
+      errors.jobDescription =
+        "Job description must be at least 10 characters";
     }
+  }
+}
 
     // CTC validation
     if (CTC === undefined || CTC === null || (typeof CTC !== "string" && typeof CTC !== "number")) {
@@ -87,6 +104,25 @@ const validateJob = (req, res, next) => {
     if (active !== undefined && active !== null && typeof active !== "boolean") {
       return res.status(400).json(new ApiResponse(400, null, "Active must be a Boolean"));
     }
+      // Form Link
+  if (formLink !== undefined) {
+    if (
+      typeof formLink !== "string" ||
+      formLink.trim().length === 0
+    ) {
+      return res.status(400).json(new ApiResponse(400, null, "Form link must be a non-empty string"));
+    } else {
+      try {
+        const url = new URL(formLink.trim());
+
+        if (!["http:", "https:"].includes(url.protocol)) {
+          return res.status(400).json(new ApiResponse(400, null, "Form link must be a valid HTTP or HTTPS URL"));
+        }
+      } catch (error) {
+        return res.status(400).json(new ApiResponse(400, null, "Form link must be a valid URL"));
+      }
+    }
+  }
 
     // Sanitize and attach validated data to request
     req.validatedJobData = {
@@ -101,6 +137,7 @@ const validateJob = (req, res, next) => {
       eligibility: eligibility.trim(),
       experience: experience.trim(),
       active: typeof active === "boolean" ? active : true,
+      formLink,
     };
 
     next();

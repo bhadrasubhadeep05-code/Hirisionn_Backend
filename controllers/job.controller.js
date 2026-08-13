@@ -11,6 +11,7 @@ const bcrypt = require("bcryptjs");
 exports.createJob = asyncHandler(async (req, res) => {
   try {
     const validatedData = req.validatedJobData || req.body;
+
     const {
       jobTitle,
       jobDescription,
@@ -23,6 +24,7 @@ exports.createJob = asyncHandler(async (req, res) => {
       eligibility,
       experience,
       active,
+      formLink,
     } = validatedData;
 
     const jobData = await Job.create({
@@ -37,6 +39,7 @@ exports.createJob = asyncHandler(async (req, res) => {
       eligibility,
       experience,
       active: typeof active === "boolean" ? active : true,
+      formLink,
     });
 
     res.status(200).json({
@@ -45,15 +48,13 @@ exports.createJob = asyncHandler(async (req, res) => {
       message: "Job post created successfully",
     });
   } catch (error) {
-    res
-      .status(500)
-      .json(
-        new ApiResponse(
-          500,
-          null,
-          "Something went wrong when creating the job post error: " + error,
-        ),
-      );
+    res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        "Something went wrong when creating the job post error: " + error,
+      ),
+    );
   }
 });
 
@@ -63,7 +64,7 @@ exports.getJobCardData = asyncHandler(async (req, res) => {
     const jobs = await Job.find({ active: true })
       .sort({ createdAt: -1 })
       .select(
-        "jobTitle CTC deadLine industries location domain jobType eligibility experience",
+        "jobTitle CTC deadLine industries location domain jobType eligibility experience formLink",
       );
 
     if (!jobs) {
@@ -84,7 +85,7 @@ exports.getJobData = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
     const job = await Job.findById(id).select(
-      "jobTitle jobDescription CTC deadLine industries location domain jobType eligibility experience",
+      "jobTitle jobDescription CTC deadLine industries location domain jobType eligibility experience formLink",
     );
 
     if (!job) {
@@ -413,6 +414,10 @@ exports.updateJob = asyncHandler(async (req, res) => {
 
     if (validatedData.active !== undefined) {
       job.active = validatedData.active;
+    }
+
+    if (validatedData.formLink !== undefined) {
+      job.formLink = validatedData.formLink;
     }
 
     // Save updated job
