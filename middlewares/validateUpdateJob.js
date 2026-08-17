@@ -128,26 +128,7 @@ const validateUpdateJob = (req, res, next) => {
     }
   }
 
-  // Form Link
-  if (formLink !== undefined) {
-    if (
-      typeof formLink !== "string" ||
-      formLink.trim().length === 0
-    ) {
-      errors.formLink = "Form link must be a non-empty string";
-    } else {
-      try {
-        const url = new URL(formLink.trim());
-
-        if (!["http:", "https:"].includes(url.protocol)) {
-          errors.formLink =
-            "Form link must be a valid HTTP or HTTPS URL";
-        }
-      } catch (error) {
-        errors.formLink = "Form link must be a valid URL";
-      }
-    }
-  }
+ 
 
   // Return validation errors
   if (Object.keys(errors).length > 0) {

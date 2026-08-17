@@ -104,25 +104,6 @@ if (jobDescription !== undefined) {
     if (active !== undefined && active !== null && typeof active !== "boolean") {
       return res.status(400).json(new ApiResponse(400, null, "Active must be a Boolean"));
     }
-      // Form Link
-  if (formLink !== undefined) {
-    if (
-      typeof formLink !== "string" ||
-      formLink.trim().length === 0
-    ) {
-      return res.status(400).json(new ApiResponse(400, null, "Form link must be a non-empty string"));
-    } else {
-      try {
-        const url = new URL(formLink.trim());
-
-        if (!["http:", "https:"].includes(url.protocol)) {
-          return res.status(400).json(new ApiResponse(400, null, "Form link must be a valid HTTP or HTTPS URL"));
-        }
-      } catch (error) {
-        return res.status(400).json(new ApiResponse(400, null, "Form link must be a valid URL"));
-      }
-    }
-  }
 
     // Sanitize and attach validated data to request
     req.validatedJobData = {
