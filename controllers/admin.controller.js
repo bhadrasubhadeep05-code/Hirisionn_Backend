@@ -179,61 +179,111 @@ const downloadUserResume = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/users/export/csv
 // @access  Private/Admin
 const exportUsersCSV = asyncHandler(async (req, res) => {
-  const users = await User.find()
-    .select("-password -securityQuestions")
-    .sort({ downloaded: 1, createdAt: -1 });
+  try {
+    const users = await User.find()
+      .select("-password -securityQuestions")
+      .sort({ downloaded: 1, createdAt: -1 })
+      .lean();
 
-  // Create CSV content
-  const headers = [
-    "ID",
-    "Full Name",
-    "Email",
-    "Phone",
-    "Experience Level",
-    "Job",
-    "Employer",
-    "Current CTC",
-    "Course",
-    "Domain",
-    "Education",
-    "LinkedIn",
-    "Profile Complete",
-    "Downloaded",
-    "Created At",
-  ];
+    // Safely format values for CSV
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) {
+        return "";
+      }
 
-  const csvRows = [headers.join(",")];
+      // Convert value to string
+      const stringValue = String(value);
 
-  users.forEach((user) => {
-    const row = [
-      user._id,
-      `"${user.fullName}"`,
-      user.email,
-      user.phoneNo,
-      user.profile?.experienceLevel || "",
-      user.profile?.job || "",
-      user.profile?.employer || "",
-      user.profile?.currentCTC || "",
-      user.profile?.course || "",
-      user.profile?.domain || "",
-      user.profile?.education || "",
-      user.profile?.linkedin || "",
-      user.isProfileComplete,
-      user.downloaded,
-      user.createdAt.toISOString(),
+      // Escape double quotes
+      const escapedValue = stringValue.replace(/"/g, '""');
+
+      // Wrap everything in quotes
+      return `"${escapedValue}"`;
+    };
+
+    // CSV headers
+    const headers = [
+      "ID",
+      "Full Name",
+      "Email",
+      "Phone",
+      "Experience Level",
+      "Job",
+      "Employer",
+      "Current CTC",
+      "Course",
+      "Domain",
+      "Education",
+      "LinkedIn",
+      "Profile Complete",
+      "Downloaded",
+      "Created At",
     ];
-    csvRows.push(row.join(","));
-  });
 
-  const csvContent = csvRows.join("\n");
+    // Start CSV with headers
+    const csvRows = [
+      headers.map(escapeCSV).join(","),
+    ];
 
-  res.setHeader("Content-Type", "text/csv");
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename=users-export-${new Date().toISOString().split("T")[0]}.csv`,
-  );
+    // Add users
+    users.forEach((user) => {
+      const row = [
+        user._id,
+        user.fullName,
+        user.email,
+        user.phoneNo,
+        user.profile?.experienceLevel,
+        user.profile?.job,
+        user.profile?.employer,
+        user.profile?.currentCTC,
+        user.profile?.course,
+        user.profile?.domain,
+        user.profile?.education,
+        user.profile?.linkedin,
+        user.isProfileComplete,
+        user.downloaded,
 
-  res.status(200).send(csvContent);
+        // Prevent toISOString() error
+        user.createdAt
+          ? new Date(user.createdAt).toISOString()
+          : "",
+      ];
+
+      csvRows.push(
+        row.map(escapeCSV).join(",")
+      );
+    });
+
+    // Create final CSV
+    const csvContent = csvRows.join("\r\n");
+
+    // Generate filename
+    const date = new Date().toISOString().split("T")[0];
+
+    const filename = `users-export-${date}.csv`;
+
+    // Response headers
+    res.setHeader(
+      "Content-Type",
+      "text/csv; charset=utf-8"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${filename}"`
+    );
+
+    // Send CSV
+    return res.status(200).send(csvContent);
+
+  } catch (error) {
+    console.error("EXPORT USERS CSV ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to export users CSV",
+    });
+  }
 });
 
 // @desc    Export only new users (after last download timestamp) to CSV
