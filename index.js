@@ -21,6 +21,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const ApiError = require("./utils/ApiError.js");
 const rateLimit = require("express-rate-limit");
+const news = require("./routes/news.js")
 
 
 connectDB();
@@ -109,6 +110,8 @@ app.use("/api/admin", admin);
 app.use("/api/enquiry", business);
 // job routes
 app.use("/api/admin/job", job);
+//news routes
+app.use("/api/news", news)
 
 const errorMiddelware = require("./middlewares/errorMiddelware");
 app.use(errorMiddelware);
