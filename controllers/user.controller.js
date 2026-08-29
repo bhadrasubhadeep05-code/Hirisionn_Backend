@@ -18,11 +18,7 @@ exports.registerUser = asyncHandler(async(req, res)=>{
     email,
     phoneNo,
     password,
-    confirmPassword,
-    securityQuestion1,
-    securityAnswer1,
-    securityQuestion2,
-    securityAnswer2
+    confirmPassword
   } = req.body;
 
   if(password !== confirmPassword){
@@ -39,16 +35,6 @@ exports.registerUser = asyncHandler(async(req, res)=>{
     email,
     phoneNo,
     password: hashPassword,
-    securityQuestions: [
-      {
-        question: securityQuestion1,
-        answer: await bcrypt.hash(securityAnswer1, 10)
-      },
-      {
-        question: securityQuestion2,
-        answer: await bcrypt.hash(securityAnswer2, 10)
-      }
-    ],
     isProfileComplete: false
   });
 

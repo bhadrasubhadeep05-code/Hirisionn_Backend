@@ -104,7 +104,7 @@ if (jobDescription !== undefined) {
     if (active !== undefined && active !== null && typeof active !== "boolean") {
       return res.status(400).json(new ApiResponse(400, null, "Active must be a Boolean"));
     }
-
+    
     // Sanitize and attach validated data to request
     req.validatedJobData = {
       jobTitle: jobTitle.trim(),

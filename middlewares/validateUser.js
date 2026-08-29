@@ -57,11 +57,7 @@ exports.validateRegister = (req, res, next) => {
     email,
     phoneNo,
     password,
-    confirmPassword,
-    securityQuestion1,
-    securityAnswer1,
-    securityQuestion2,
-    securityAnswer2
+    confirmPassword
   } = req.body;
 
   // Full name
@@ -90,16 +86,6 @@ exports.validateRegister = (req, res, next) => {
   }
   if (password !== confirmPassword) {
     throw new ApiError("Passwords do not match", 400);
-  }
-
-  // Security questions & answers
-  assertText(securityQuestion1, "Security question 1", { min: 3, max: 200 });
-  assertText(securityAnswer1, "Security answer 1", { min: 2, max: 200 });
-  assertText(securityQuestion2, "Security question 2", { min: 3, max: 200 });
-  assertText(securityAnswer2, "Security answer 2", { min: 2, max: 200 });
-
-  if (securityQuestion1.trim() === securityQuestion2.trim()) {
-    throw new ApiError("Security questions must be different", 400);
   }
 
   next();

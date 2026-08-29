@@ -22,6 +22,8 @@ const {
   validateSecurityAnswers,
   validateResetPassword
 } = require("../middlewares/validateUser");
+
+const {otpGenrator, verifyOtp, ResetPassword} = require("../controllers/otp.controller.js")
 const rateLimit = require("express-rate-limit");
 
 
@@ -64,9 +66,14 @@ router.post('/logout', logoutUser);
 router.put('/profile', verifyJWT, completeProfile);
 
 // Forgot Password Routes
-router.post('/forgot-password/verify-user', passwordResetLimiter, validateVerifyUser, verifyUserForReset);
-router.post('/forgot-password/verify-answers', passwordResetLimiter, validateSecurityAnswers, verifySecurityAnswers);
-router.post('/forgot-password/reset', passwordResetLimiter, validateResetPassword, resetPassword);
+// router.post('/forgot-password/verify-user', passwordResetLimiter, validateVerifyUser, verifyUserForReset);
+// router.post('/forgot-password/verify-answers', passwordResetLimiter, validateSecurityAnswers, verifySecurityAnswers);
+// router.post('/forgot-password/reset', passwordResetLimiter, validateResetPassword, resetPassword);
+
+//otp password recovery
+router.post('/forgot-password', passwordResetLimiter, otpGenrator)
+router.post('/verify-otp', passwordResetLimiter, verifyOtp)
+router.post('/reset-password', passwordResetLimiter, ResetPassword)
 
 //get User Route
 router.get('/getUser', verifyJWT, getUser);
