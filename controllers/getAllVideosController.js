@@ -6,22 +6,21 @@ const Video = require("../models/Video.model");
  * @route   GET /api/videos/blogs
  * @access  Public
  */
-exports.getVideoCon = asyncHandler(async(req,res)=>{
+exports.getVideoCon = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    const videos = await Video.find({ category: "Video" })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
+    const videos = await Video.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
 
-    const totalVideos = await Video.countDocuments({ category: "Video" });
+    const totalVideos = await Video.countDocuments();
 
     res.status(200).json({
         success: true,
         page,
-        category: "Video (General Thought Leadership & Updates)",
         data: videos,
         totalVideos,
         totalPages: Math.ceil(totalVideos / limit),
@@ -34,15 +33,15 @@ exports.getVideoCon = asyncHandler(async(req,res)=>{
  * @route   GET /api/videos/workforce-insights
  * @access  Public
  */
-exports.getWorkforceInsightsVideoCon = asyncHandler(async(req,res)=>{
+exports.getWorkforceInsightsVideoCon = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
     const videos = await Video.find({ category: "Marketing" })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
 
     const totalVideos = await Video.countDocuments({ category: "Marketing" });
 
@@ -62,15 +61,15 @@ exports.getWorkforceInsightsVideoCon = asyncHandler(async(req,res)=>{
  * @route   GET /api/videos/industry-insights
  * @access  Public
  */
-exports.getIndustryInsightsVideoCon = asyncHandler(async(req,res)=>{
+exports.getIndustryInsightsVideoCon = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
     const videos = await Video.find({ category: "Finance" })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
 
     const totalVideos = await Video.countDocuments({ category: "Finance" });
 

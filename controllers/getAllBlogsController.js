@@ -2,7 +2,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const Blog = require("../models/Blog.model");
 
 /**
- * @desc    Get all Blogs category 
+ * @desc    Get all Blogs
  * @route   GET /api/blogs/blogs
  * @access  Public
  */
@@ -11,17 +11,16 @@ exports.getBlogsBlogCon = asyncHandler(async(req,res)=>{
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    const blogs = await Blog.find({ category: "Blog" })
+    const blogs = await Blog.find()
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
 
-    const totalBlogs = await Blog.countDocuments({ category: "Blog" });
+    const totalBlogs = await Blog.countDocuments();
 
     res.status(200).json({
         success: true,
         page,
-        category: "Blogs (General Thought Leadership & Updates)",
         data: blogs,
         totalBlogs,
         totalPages: Math.ceil(totalBlogs / limit),

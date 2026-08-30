@@ -272,14 +272,30 @@ exports.stateController = asyncHandler(async (req, res) => {
       });
     }
 
-    if (typeof state !== "string" || !["Applied", "Selected", "Rejected", "applied", "selected", "rejected"].includes(state)) {
+    const validStates = [
+      "Applied",
+      "Selected",
+      "Rejected",
+      "Shortlisted",
+      "Sortlisted",
+      "applied",
+      "selected",
+      "rejected",
+      "shortlisted",
+      "sortlisted",
+    ];
+
+    if (typeof state !== "string" || !validStates.includes(state)) {
       return res.status(400).json({
         success: false,
-        message: "state must be one of: Applied, Selected, Rejected",
+        message: "state must be one of: Applied, Shortlisted, Selected, Rejected",
       });
     }
 
-    const normalizedState = state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+    let normalizedState = state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+    if (normalizedState === "Sortlisted") {
+      normalizedState = "Shortlisted";
+    }
 
     const user = await User.findById(id);
 

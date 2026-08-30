@@ -22,10 +22,6 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-     subCategory: {
-      type: String,
-      required: true,
-    },
     imgLink:{
       type: String,
     },

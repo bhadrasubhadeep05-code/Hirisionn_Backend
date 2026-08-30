@@ -1,9 +1,8 @@
-const NEWS_FEED_URL =
-  "https://rss.app/feeds/v1.1/tbmASKCZXJTlWnnZ.json";
+
 
 exports.getBusinessNews = async () => {
-  const response = await fetch(NEWS_FEED_URL);
-
+  const response = await fetch(process.env.NEWS_FEED_URL);
+ 
   if (!response.ok) {
     throw new Error(
       `RSS feed request failed: ${response.status}`
