@@ -3,6 +3,7 @@ const User = require("../models/User.model.js");
 const ApiResponse = require("../utils/ApiResponse.js");
 const ApiError = require("../utils/ApiError.js");
 const asyncHandler = require("../utils/asyncHandler.js");
+const { sendEmail } = require("../utils/mailer.js");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -253,6 +254,214 @@ exports.getApplicants = asyncHandler(async (req, res) => {
   }
 });
 
+// Helper to generate candidate status email content
+const getCandidateStatusEmail = (state, candidateName, jobTitle) => {
+  if (state === "Shortlisted") {
+    const subject = `Shortlisted for Interview: ${jobTitle} | Hirisionn`;
+    const text = `Dear ${candidateName},\n\nCongratulations!\n\nWe are pleased to inform you that you have been shortlisted for an interview for the ${jobTitle}.\nOur recruitment team will contact you with the interview details, including the date, time, and interview format, shortly.\n\nPlease keep an eye on your email for further communication and ensure that your contact details are up to date.\n\nWe look forward to speaking with you and learning more about your skills and experience.\n\nBest regards,\nHirisionn`;
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shortlisted for Interview</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%); padding: 36px 32px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Hirisionn</h1>
+              <p style="color: #e0e7ff; margin: 6px 0 0 0; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600;">Recruitment Update</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 36px 32px 28px 32px;">
+              <p style="font-size: 16px; line-height: 24px; color: #334155; margin: 0 0 20px 0;">
+                Dear <strong>${candidateName}</strong>,
+              </p>
+              <div style="background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 8px; padding: 18px 20px; margin: 0 0 24px 0;">
+                <h2 style="color: #15803d; margin: 0 0 8px 0; font-size: 20px; font-weight: 700;">Congratulations!</h2>
+                <p style="color: #166534; margin: 0; font-size: 15px; line-height: 22px;">
+                  We are pleased to inform you that you have been <strong>shortlisted for an interview</strong> for the <strong>${jobTitle}</strong>.
+                </p>
+              </div>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 16px 0;">
+                Our recruitment team will contact you with the interview details, including the <strong>date, time, and interview format</strong>, shortly.
+              </p>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 16px 0;">
+                Please keep an eye on your email for further communication and ensure that your contact details are up to date.
+              </p>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 28px 0;">
+                We look forward to speaking with you and learning more about your skills and experience.
+              </p>
+              <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 24px;">
+                <p style="font-size: 15px; line-height: 22px; color: #64748b; margin: 0;">
+                  Best regards,<br>
+                  <strong style="color: #0f172a; font-size: 16px;">Hirisionn</strong>
+                </p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8fafc; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="color: #94a3b8; font-size: 12px; line-height: 18px; margin: 0;">
+                This is an automated notification from Hirisionn. Please do not reply directly to this email.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+    return { subject, text, html };
+  }
+
+  if (state === "Selected") {
+    const subject = `Congratulations! You have been Selected for ${jobTitle} | Hirisionn`;
+    const text = `Dear ${candidateName},\n\nCongratulations!\n\nWe are delighted to inform you that you have been selected for the ${jobTitle}.\n\nWe appreciate the effort you put into the recruitment process and were impressed with your qualifications and performance.\n\nOur team will contact you shortly with the next steps, including details regarding your joining date, required documentation, and other onboarding formalities.\n\nWe look forward to welcoming you to the team and wish you a successful journey.\n\nCongratulations once again!\n\nBest regards,\nHirisionn`;
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selected for Offer</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%); padding: 36px 32px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Hirisionn</h1>
+              <p style="color: #ecfdf5; margin: 6px 0 0 0; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600;">Offer & Selection</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 36px 32px 28px 32px;">
+              <p style="font-size: 16px; line-height: 24px; color: #334155; margin: 0 0 20px 0;">
+                Dear <strong>${candidateName}</strong>,
+              </p>
+              <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 18px 20px; margin: 0 0 24px 0;">
+                <h2 style="color: #065f46; margin: 0 0 8px 0; font-size: 20px; font-weight: 700;">Congratulations!</h2>
+                <p style="color: #047857; margin: 0; font-size: 15px; line-height: 22px;">
+                  We are delighted to inform you that you have been <strong>selected for the ${jobTitle}</strong>.
+                </p>
+              </div>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 16px 0;">
+                We appreciate the effort you put into the recruitment process and were impressed with your qualifications and performance.
+              </p>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 16px 0;">
+                Our team will contact you shortly with the next steps, including details regarding your <strong>joining date, required documentation, and other onboarding formalities</strong>.
+              </p>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 16px 0;">
+                We look forward to welcoming you to the team and wish you a successful journey.
+              </p>
+              <p style="font-size: 15px; line-height: 24px; color: #047857; font-weight: 600; margin: 0 0 28px 0;">
+                Congratulations once again!
+              </p>
+              <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 24px;">
+                <p style="font-size: 15px; line-height: 22px; color: #64748b; margin: 0;">
+                  Best regards,<br>
+                  <strong style="color: #0f172a; font-size: 16px;">Hirisionn</strong>
+                </p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8fafc; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="color: #94a3b8; font-size: 12px; line-height: 18px; margin: 0;">
+                This is an automated notification from Hirisionn. Please do not reply directly to this email.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+    return { subject, text, html };
+  }
+
+  if (state === "Rejected") {
+    const subject = `Update on your application for ${jobTitle} | Hirisionn`;
+    const text = `Dear ${candidateName},\n\nThank you for your interest in the ${jobTitle} and for taking the time to complete the application process.\n\nAfter careful consideration, we regret to inform you that your application has not been selected to move forward in the recruitment process at this time.\n\nWe appreciate the time and effort you invested in applying. We encourage you to explore future opportunities with Hirisionn that may align with your skills and experience.\n\nWe wish you all the best in your career.\n\nBest regards,\nHirisionn`;
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application Status Update</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #334155 0%, #475569 50%, #64748b 100%); padding: 36px 32px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Hirisionn</h1>
+              <p style="color: #cbd5e1; margin: 6px 0 0 0; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600;">Application Update</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 36px 32px 28px 32px;">
+              <p style="font-size: 16px; line-height: 24px; color: #334155; margin: 0 0 20px 0;">
+                Dear <strong>${candidateName}</strong>,
+              </p>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 16px 0;">
+                Thank you for your interest in the <strong>${jobTitle}</strong> and for taking the time to complete the application process.
+              </p>
+              <div style="background: #f8fafc; border-left: 4px solid #94a3b8; border-radius: 8px; padding: 18px 20px; margin: 0 0 20px 0;">
+                <p style="color: #334155; margin: 0; font-size: 15px; line-height: 22px;">
+                  After careful consideration, we regret to inform you that your application has not been selected to move forward in the recruitment process at this time.
+                </p>
+              </div>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 16px 0;">
+                We appreciate the time and effort you invested in applying. We encourage you to explore future opportunities with Hirisionn that may align with your skills and experience.
+              </p>
+              <p style="font-size: 15px; line-height: 24px; color: #475569; margin: 0 0 28px 0;">
+                We wish you all the best in your career.
+              </p>
+              <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 24px;">
+                <p style="font-size: 15px; line-height: 22px; color: #64748b; margin: 0;">
+                  Best regards,<br>
+                  <strong style="color: #0f172a; font-size: 16px;">Hirisionn</strong>
+                </p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8fafc; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="color: #94a3b8; font-size: 12px; line-height: 18px; margin: 0;">
+                This is an automated notification from Hirisionn. Please do not reply directly to this email.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+    return { subject, text, html };
+  }
+
+  return null;
+};
+
 //user job status control
 exports.stateController = asyncHandler(async (req, res) => {
   try {
@@ -319,6 +528,35 @@ exports.stateController = asyncHandler(async (req, res) => {
 
     placement.status = normalizedState;
     await user.save();
+
+    // Send email notification for Shortlisted, Selected, or Rejected states
+    if (user.email && ["Shortlisted", "Selected", "Rejected"].includes(normalizedState)) {
+      try {
+        let jobTitle = placement.jobTitle;
+        if (!jobTitle) {
+          const job = await Job.findById(jobId).select("jobTitle");
+          if (job) {
+            jobTitle = job.jobTitle;
+          }
+        }
+        jobTitle = jobTitle || "the position";
+
+        const candidateName = user.fullName || "Candidate";
+        const emailContent = getCandidateStatusEmail(normalizedState, candidateName, jobTitle);
+
+        if (emailContent) {
+          await sendEmail({
+            to: user.email,
+            subject: emailContent.subject,
+            text: emailContent.text,
+            html: emailContent.html,
+            from: `"Hirisionn Recruitment" <${process.env.GMAIL_USER}>`,
+          });
+        }
+      } catch (emailError) {
+        console.error(`Failed to send ${normalizedState} email notification:`, emailError.message);
+      }
+    }
 
     return res.status(200).json({
       success: true,

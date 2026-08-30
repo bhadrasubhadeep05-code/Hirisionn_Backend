@@ -8,9 +8,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function sendEmail({ to, subject, html, text }) {
+async function sendEmail({ to, subject, html, text, from }) {
   const mailOptions = {
-    from: `"Website Notification" <${process.env.GMAIL_USER}>`,
+    from: from || `"Hirisionn" <${process.env.GMAIL_USER}>`,
     to,
     subject,
     text: text || html.replace(/<[^>]*>?/gm, ''),
