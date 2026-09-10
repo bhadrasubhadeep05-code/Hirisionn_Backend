@@ -1,26 +1,35 @@
+const Parser = require("rss-parser");
 
+const parser = new Parser();
 
 exports.getBusinessNews = async () => {
-  const response = await fetch(process.env.NEWS_FEED_URL);
- 
-  if (!response.ok) {
-    throw new Error(
-      `RSS feed request failed: ${response.status}`
-    );
+  try {
+    const response = await fetch("https://news.google.com/rss/search?q=business+India&hl=en-IN&gl=IN&ceid=IN:en");
+
+    if (!response.ok) {
+      throw new Error(
+        `RSS feed request failed: ${response.status}`
+      );
+    }
+
+    const xml = await response.text();
+
+    const feed = await parser.parseString(xml);
+
+    const news = feed.items.map((item) => ({
+      id: item.guid || item.link,
+      title: item.title || "",
+      description: item.contentSnippet || item.content || "",
+      image: item.enclosure?.url || null,
+      url: item.link || "",
+      publishedAt: item.isoDate || item.pubDate || null,
+      author: item.creator || item.author || null,
+      source: feed.title || "Business",
+    }));
+
+    return news;
+  } catch (error) {
+    console.error("Business news error:", error);
+    throw error;
   }
-
-  const feed = await response.json();
-
-  const news = feed.items.map((item) => ({
-    id: item.id,
-    title: item.title,
-    description: item.content_text || "",
-    image: item.image || null,
-    url: item.url,
-    publishedAt: item.date_published || null,
-    author: item.authors?.[0]?.name || null,
-    source: feed.title || "Business",
-  }));
-
-  return news;
 };
