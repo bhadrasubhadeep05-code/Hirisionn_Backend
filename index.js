@@ -21,7 +21,8 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const ApiError = require("./utils/ApiError.js");
 const rateLimit = require("express-rate-limit");
-const news = require("./routes/news.js")
+const news = require("./routes/news.js");
+const emailRoutes = require("./routes/emailRoutes.js");
 
 
 connectDB();
@@ -76,6 +77,8 @@ app.get("/helth", (req, res) => {
   });
 });
 
+
+
 // to upload image
 app.use("/api/upload", imageUploadRoute);
 //to delete image
@@ -110,6 +113,8 @@ app.use("/api/admin", admin);
 app.use("/api/enquiry", business);
 // job routes
 app.use("/api/admin/job", job);
+//email
+app.use("/api/admin/emails", emailRoutes);
 //news routes
 app.use("/api/news", news)
 
